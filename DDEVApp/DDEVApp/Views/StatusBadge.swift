@@ -33,6 +33,7 @@ extension DDEVProjectStatus {
     var label: String {
         switch self {
         case .running: "En cours"
+        case .starting: "Démarrage"
         case .stopped: "Arrêté"
         case .paused: "En pause"
         case .other(let value): value.isEmpty ? "Inconnu" : value
@@ -42,6 +43,7 @@ extension DDEVProjectStatus {
     var color: Color {
         switch self {
         case .running: .green
+        case .starting: .yellow
         case .stopped: .secondary
         case .paused: .orange
         case .other: .red

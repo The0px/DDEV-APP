@@ -31,6 +31,9 @@ struct ContentView: View {
         .task {
             await store.refresh()
         }
+        .task {
+            await store.watchDockerEvents()
+        }
         // Après « Réessayer » ou la suppression d'un projet, la sélection doit rester valide.
         .onChange(of: store.projects, initial: true) { _, projects in
             if !projects.contains(where: { $0.id == selection }) {

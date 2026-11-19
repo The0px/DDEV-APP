@@ -4,7 +4,7 @@ import Foundation
 public struct DDEVClient: Sendable {
     private let executableURL: URL?
     private let runner: any ProcessRunning
-    private let locator: DDEVLocator
+    private let locator: ExecutableLocator
     private let baseEnvironment: [String: String]
     private let listTimeout: Duration
     private let actionTimeout: Duration
@@ -16,7 +16,7 @@ public struct DDEVClient: Sendable {
     public init(
         executableURL: URL? = nil,
         runner: any ProcessRunning = SystemProcessRunner(),
-        locator: DDEVLocator = DDEVLocator(),
+        locator: ExecutableLocator = ExecutableLocator(executableName: "ddev"),
         baseEnvironment: [String: String] = ProcessInfo.processInfo.environment,
         listTimeout: Duration = .seconds(20),
         actionTimeout: Duration = .seconds(600)

@@ -61,8 +61,16 @@ final class DDEVProjectDecodingTests: XCTestCase {
         assertInvalidJSON(#"{"raw":[{"status":"running"}]}"#)
     }
 
+    func testStartingStatusIsUpButNotRunning() {
+        let status = DDEVProjectStatus(rawValue: "starting")
+
+        XCTAssertEqual(status, .starting)
+        XCTAssertTrue(status.isUp)
+        XCTAssertFalse(DDEVProjectStatus.stopped.isUp)
+    }
+
     func testStatusRoundTripsThroughEncoding() throws {
-        let project = DDEVProject(name: "a", status: .other("starting"), type: "php", primaryURL: nil, appRoot: "/a")
+        let project = DDEVProject(name: "a", status: .other("unhealthy"), type: "php", primaryURL: nil, appRoot: "/a")
 
         let decoded = try JSONDecoder().decode(DDEVProject.self, from: JSONEncoder().encode(project))
 

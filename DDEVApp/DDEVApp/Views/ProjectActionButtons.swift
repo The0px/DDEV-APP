@@ -10,7 +10,7 @@ struct ProjectActionButtons: View {
 
     var body: some View {
         Group {
-            if project.status == .running {
+            if project.status.isUp {
                 Button {
                     Task { await store.stop(project) }
                 } label: {

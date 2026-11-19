@@ -13,6 +13,7 @@ Offrir une interface macOS native au-dessus de la CLI `ddev` : voir ses projets 
 - Liste des projets DDEV avec leur état (en cours, arrêté, en pause)
 - Fiche d'un projet : type, dossier, URL
 - Démarrer, arrêter, redémarrer un projet ; ouvrir le site ; afficher le dossier dans le Finder (aussi depuis le menu contextuel de la liste)
+- Mise à jour automatique de la liste quand un conteneur DDEV démarre, s'arrête ou devient sain, y compris après un `ddev start` lancé dans le terminal (écoute de `docker events`)
 - Rafraîchissement manuel (⌘R)
 - Message clair quand DDEV est introuvable ou ne répond pas (Docker arrêté, autorisation macOS en attente) ; le processus `ddev` bloqué est arrêté
 - Modes clair et sombre
@@ -85,7 +86,7 @@ Au premier accès à un projet rangé dans Documents, Bureau ou Téléchargement
 ### 2. Surveillance Docker et DDEV
 
 - [x] Délai maximal sur les appels `ddev`, avec arrêt forcé du processus bloqué
-- [ ] Flux d'events `docker events` pour rafraîchir l'état automatiquement
+- [x] Flux d'events `docker events` pour rafraîchir l'état automatiquement (rafales regroupées en un seul `ddev list`, reconnexion quand Docker redémarre)
 - [ ] Détection du fournisseur Docker (Docker Desktop, OrbStack, Colima) et de son état
 - [ ] Notifications lors d'un changement d'état
 

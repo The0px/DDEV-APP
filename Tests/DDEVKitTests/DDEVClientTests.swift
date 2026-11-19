@@ -46,7 +46,7 @@ final class DDEVClientTests: XCTestCase {
 
     func testThrowsNotFoundWhenLocatorFindsNothing() async {
         let runner = MockProcessRunner(result: .success(ProcessOutput(exitCode: 0)))
-        let locator = DDEVLocator(searchDirectories: ["/nowhere"], isExecutable: { _ in false })
+        let locator = ExecutableLocator(executableName: "ddev", searchDirectories: ["/nowhere"], isExecutable: { _ in false })
         let client = DDEVClient(runner: runner, locator: locator)
 
         await assertListProjects(client, throws: .ddevNotFound)
@@ -97,7 +97,8 @@ final class DDEVClientTests: XCTestCase {
     }
 
     func testLocatorReturnsFirstExecutableCandidate() {
-        let locator = DDEVLocator(
+        let locator = ExecutableLocator(
+            executableName: "ddev",
             searchDirectories: ["/usr/bin", "/opt/homebrew/bin", "/usr/local/bin"],
             isExecutable: { $0 != "/usr/bin/ddev" }
         )
@@ -105,10 +106,13 @@ final class DDEVClientTests: XCTestCase {
         XCTAssertEqual(locator.locate(), ddevURL)
     }
 
-    func testDefaultSearchDirectoriesAddHomebrewWithoutDuplicates() {
-        let directories = DDEVLocator.defaultSearchDirectories(environment: ["PATH": "/usr/bin:/opt/homebrew/bin"])
+    func testDefaultSearchDirectoriesAddKnownFoldersWithoutDuplicates() {
+        let directories = ExecutableLocator.defaultSearchDirectories(
+            environment: ["PATH": "/usr/bin:/opt/homebrew/bin"],
+            home: "/Users/dev"
+        )
 
-        XCTAssertEqual(directories, ["/usr/bin", "/opt/homebrew/bin", "/usr/local/bin"])
+        XCTAssertEqual(directories, ["/usr/bin", "/opt/homebrew/bin", "/usr/local/bin", "/Users/dev/.orbstack/bin"])
     }
 
     private func assertListProjects(

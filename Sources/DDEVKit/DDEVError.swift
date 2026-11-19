@@ -6,6 +6,7 @@ public enum DDEVError: Error, Equatable, Sendable {
     case nonZeroExit(code: Int32, stderr: String)
     case invalidJSON(String)
     case timedOut(seconds: Int)
+    case dockerNotFound
 }
 
 extension DDEVError: LocalizedError {
@@ -19,6 +20,8 @@ extension DDEVError: LocalizedError {
             stderr.isEmpty ? "ddev s'est terminé avec le code \(code)." : "ddev s'est terminé avec le code \(code) : \(stderr)"
         case .invalidJSON(let reason):
             "La sortie JSON de ddev est invalide : \(reason)"
+        case .dockerNotFound:
+            "Le binaire docker est introuvable. Installez Docker Desktop, OrbStack ou Colima."
         case .timedOut(let seconds):
             "ddev ne répond pas après \(seconds) s. Vérifiez que Docker est démarré (Docker Desktop, OrbStack ou Colima) et qu'aucune demande d'autorisation macOS n'attend votre réponse."
         }

@@ -34,13 +34,7 @@ public struct SystemProcessRunner: ProcessRunning {
             let (out, err) = await (stdout, stderr)
             return ProcessOutput(exitCode: await exit.value, stdout: out, stderr: err)
         } onCancel: {
-            process.terminate()
-            // ddev intercepte SIGTERM et reste bloqué si un appel système attend,
-            // par exemple une demande d'accès macOS au dossier Documents.
-            let pid = process.processIdentifier
-            DispatchQueue.global().asyncAfter(deadline: .now() + 2) {
-                if process.isRunning { kill(pid, SIGKILL) }
-            }
+            process.terminate(killingAfter: 2)
         }
     }
 

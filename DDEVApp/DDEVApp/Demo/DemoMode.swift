@@ -8,8 +8,12 @@ enum DemoMode {
         ProcessInfo.processInfo.arguments.contains("--demo")
     }
 
-    static func makeClient() -> DDEVClient {
-        DDEVClient(executableURL: URL(fileURLWithPath: "/demo/ddev"), runner: DemoProcessRunner())
+    @MainActor
+    static func makeStore() -> ProjectStore {
+        ProjectStore(
+            client: DDEVClient(executableURL: URL(fileURLWithPath: "/demo/ddev"), runner: DemoProcessRunner()),
+            events: nil
+        )
     }
 }
 

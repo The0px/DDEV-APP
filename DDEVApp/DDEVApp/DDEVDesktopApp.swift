@@ -3,7 +3,7 @@ import SwiftUI
 
 @main
 struct DDEVDesktopApp: App {
-    @State private var store = ProjectStore(client: DemoMode.isEnabled ? DemoMode.makeClient() : DDEVClient())
+    @State private var store = DemoMode.isEnabled ? DemoMode.makeStore() : ProjectStore()
 
     var body: some Scene {
         WindowGroup("DDEV") {
