@@ -8,20 +8,32 @@ final class MockProcessRunner: ProcessRunning, @unchecked Sendable {
     }
 
     private let lock = NSLock()
-    private let result: Result<ProcessOutput, any Error>
+    private let handler: @Sendable ([String]) async throws -> ProcessOutput
     private var recordedCalls: [Call] = []
+    private var recordedEnvironments: [[String: String]?] = []
 
-    init(result: Result<ProcessOutput, any Error>) {
-        self.result = result
+    init(handler: @escaping @Sendable ([String]) async throws -> ProcessOutput) {
+        self.handler = handler
+    }
+
+    convenience init(result: Result<ProcessOutput, any Error>) {
+        self.init { _ in try result.get() }
     }
 
     var calls: [Call] {
         lock.withLock { recordedCalls }
     }
 
-    func run(_ executableURL: URL, arguments: [String]) async throws -> ProcessOutput {
-        lock.withLock { recordedCalls.append(Call(executableURL: executableURL, arguments: arguments)) }
-        return try result.get()
+    var environments: [[String: String]?] {
+        lock.withLock { recordedEnvironments }
+    }
+
+    func run(_ executableURL: URL, arguments: [String], environment: [String: String]?) async throws -> ProcessOutput {
+        lock.withLock {
+            recordedCalls.append(Call(executableURL: executableURL, arguments: arguments))
+            recordedEnvironments.append(environment)
+        }
+        return try await handler(arguments)
     }
 }
 

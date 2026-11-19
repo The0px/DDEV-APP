@@ -14,6 +14,36 @@ final class DDEVClientTests: XCTestCase {
         XCTAssertEqual(runner.calls, [.init(executableURL: ddevURL, arguments: ["list", "--json-output"])])
     }
 
+    func testProjectActionsPassTheProjectName() async throws {
+        let runner = MockProcessRunner(result: .success(ProcessOutput(exitCode: 0)))
+        let client = DDEVClient(executableURL: ddevURL, runner: runner)
+        let project = DDEVProject(name: "blog", status: .stopped, type: "laravel", primaryURL: nil, appRoot: "/a")
+
+        try await client.start(project)
+        try await client.stop(project)
+        try await client.restart(project)
+
+        XCTAssertEqual(runner.calls.map(\.arguments), [["start", "blog"], ["stop", "blog"], ["restart", "blog"]])
+    }
+
+    func testExtendsPathSoDDEVFindsDocker() async throws {
+        let runner = MockProcessRunner(result: .success(ProcessOutput(exitCode: 0, stdout: Data(#"{"raw":[]}"#.utf8))))
+        let client = DDEVClient(
+            executableURL: URL(fileURLWithPath: "/custom/bin/ddev"),
+            runner: runner,
+            baseEnvironment: ["PATH": "/usr/bin:/opt/homebrew/bin", "HOME": "/Users/dev"]
+        )
+
+        _ = try await client.listProjects()
+
+        let environment = try XCTUnwrap(runner.environments.first ?? nil)
+        let path = try XCTUnwrap(environment["PATH"]).split(separator: ":").map(String.init)
+        XCTAssertEqual(Array(path.prefix(3)), ["/usr/bin", "/opt/homebrew/bin", "/custom/bin"])
+        XCTAssertTrue(path.contains("/usr/local/bin"))
+        XCTAssertEqual(path.count, Set(path).count)
+        XCTAssertEqual(environment["HOME"], "/Users/dev")
+    }
+
     func testThrowsNotFoundWhenLocatorFindsNothing() async {
         let runner = MockProcessRunner(result: .success(ProcessOutput(exitCode: 0)))
         let locator = DDEVLocator(searchDirectories: ["/nowhere"], isExecutable: { _ in false })
@@ -43,6 +73,16 @@ final class DDEVClientTests: XCTestCase {
             DDEVClient(executableURL: ddevURL, runner: runner),
             throws: .nonZeroExit(code: 1, stderr: "Docker is not running")
         )
+    }
+
+    func testThrowsTimedOutWhenDDEVHangs() async {
+        let runner = MockProcessRunner { _ in
+            try await Task.sleep(for: .seconds(30))
+            return ProcessOutput(exitCode: 0)
+        }
+        let client = DDEVClient(executableURL: ddevURL, runner: runner, listTimeout: .milliseconds(50))
+
+        await assertListProjects(client, throws: .timedOut(seconds: 0))
     }
 
     func testThrowsInvalidJSON() async {

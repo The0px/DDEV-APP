@@ -19,5 +19,6 @@ public enum ProcessRunnerError: Error, Equatable, Sendable {
 
 /// Point d'injection pour simuler l'exécution de `ddev` dans les tests.
 public protocol ProcessRunning: Sendable {
-    func run(_ executableURL: URL, arguments: [String]) async throws -> ProcessOutput
+    /// - Parameter environment: environnement complet du processus ; `nil` hérite de celui de l'app.
+    func run(_ executableURL: URL, arguments: [String], environment: [String: String]?) async throws -> ProcessOutput
 }
