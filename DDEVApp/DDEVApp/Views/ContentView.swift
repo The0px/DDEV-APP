@@ -50,7 +50,7 @@ struct ContentView: View {
             }
         }
         .alert(
-            "ddev a renvoyé une erreur",
+            "L'opération DDEV a échoué",
             isPresented: Binding(get: { store.lastError != nil }, set: { if !$0 { store.lastError = nil } }),
             presenting: store.lastError
         ) { _ in

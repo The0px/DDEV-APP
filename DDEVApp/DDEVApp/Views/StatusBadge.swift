@@ -1,16 +1,31 @@
 import DDEVKit
 import SwiftUI
 
+/// La couleur reste sur la pastille : en texte, le vert et l'orange système
+/// passent sous 3:1 en mode clair.
 struct StatusBadge: View {
     let status: DDEVProjectStatus
 
     var body: some View {
-        Text(status.label)
-            .font(.callout.weight(.medium))
-            .padding(.horizontal, 10)
-            .padding(.vertical, 3)
-            .foregroundStyle(status.color)
-            .background(status.color.opacity(0.15), in: Capsule())
+        HStack(spacing: 6) {
+            StatusDot(status: status)
+            Text(status.label)
+        }
+        .font(.callout.weight(.medium))
+        .padding(.horizontal, 10)
+        .padding(.vertical, 3)
+        .background(status.color.opacity(0.15), in: Capsule())
+    }
+}
+
+struct StatusDot: View {
+    let status: DDEVProjectStatus
+
+    var body: some View {
+        Circle()
+            .fill(status.color)
+            .frame(width: 8, height: 8)
+            .accessibilityHidden(true)
     }
 }
 

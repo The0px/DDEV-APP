@@ -14,13 +14,14 @@ Offrir une interface macOS native au-dessus de la CLI `ddev` : voir ses projets 
 - Fiche d'un projet : type, dossier, URL
 - Démarrer, arrêter, redémarrer un projet ; ouvrir le site ; afficher le dossier dans le Finder (aussi depuis le menu contextuel de la liste)
 - Rafraîchissement manuel (⌘R)
-- Message clair quand DDEV est introuvable ou que Docker ne répond pas
+- Message clair quand DDEV est introuvable ou ne répond pas (Docker arrêté, autorisation macOS en attente) ; le processus `ddev` bloqué est arrêté
+- Modes clair et sombre
 
-| Projet arrêté | Docker arrêté |
+| Projet arrêté (mode clair) | ddev ne répond pas |
 | --- | --- |
-| ![Fiche d'un projet arrêté](docs/screenshots/projet-arrete.png) | ![Message quand Docker ne répond pas](docs/screenshots/docker-arrete.png) |
+| ![Fiche d'un projet arrêté en mode clair](docs/screenshots/projet-arrete.png) | ![Message quand ddev ne répond pas](docs/screenshots/ddev-sans-reponse.png) |
 
-Les captures utilisent le mode démo (projets fictifs), sauf « Docker arrêté » prise avec une vraie installation.
+Les captures des projets utilisent le mode démo (projets fictifs) ; la dernière est prise avec une vraie installation.
 
 ## Prérequis
 
@@ -68,7 +69,9 @@ Dans Xcode : *Product > Scheme > Edit Scheme > Run > Arguments*, cochez `--demo`
 
 ## Distribution
 
-L'app n'utilise pas l'App Sandbox : un processus lancé par une app sandboxée hérite de son sandbox, et `ddev` doit pouvoir écrire dans `~/.ddev`, dans les dossiers des projets et joindre le socket Docker. Elle est donc prévue pour une distribution hors Mac App Store (Developer ID, notarisation, Hardened Runtime activé). Au premier accès à un projet rangé dans Documents, Bureau ou Téléchargements, macOS demande l'autorisation à DDEV-APP.
+L'app n'utilise pas l'App Sandbox : un processus lancé par une app sandboxée hérite de son sandbox, et `ddev` doit pouvoir écrire dans `~/.ddev`, dans les dossiers des projets et joindre le socket Docker. Elle est donc prévue pour une distribution hors Mac App Store (Developer ID, notarisation, Hardened Runtime activé).
+
+Au premier accès à un projet rangé dans Documents, Bureau ou Téléchargements, macOS demande l'autorisation à DDEV-APP. Tant que la demande reste sans réponse, `ddev` est bloqué : cliquez sur « Autoriser », puis sur « Réessayer » dans l'app. En développement, l'app est signée localement : macOS peut reposer la question après une recompilation.
 
 ## Feuille de route
 
@@ -81,7 +84,7 @@ L'app n'utilise pas l'App Sandbox : un processus lancé par une app sandboxée h
 
 ### 2. Surveillance Docker et DDEV
 
-- [x] Délai maximal sur `ddev list` quand Docker ne répond pas
+- [x] Délai maximal sur les appels `ddev`, avec arrêt forcé du processus bloqué
 - [ ] Flux d'events `docker events` pour rafraîchir l'état automatiquement
 - [ ] Détection du fournisseur Docker (Docker Desktop, OrbStack, Colima) et de son état
 - [ ] Notifications lors d'un changement d'état

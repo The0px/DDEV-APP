@@ -20,7 +20,7 @@ extension DDEVError: LocalizedError {
         case .invalidJSON(let reason):
             "La sortie JSON de ddev est invalide : \(reason)"
         case .timedOut(let seconds):
-            "ddev ne répond pas après \(seconds) s. Vérifiez que Docker est démarré (Docker Desktop, OrbStack ou Colima)."
+            "ddev ne répond pas après \(seconds) s. Vérifiez que Docker est démarré (Docker Desktop, OrbStack ou Colima) et qu'aucune demande d'autorisation macOS n'attend votre réponse."
         }
     }
 }

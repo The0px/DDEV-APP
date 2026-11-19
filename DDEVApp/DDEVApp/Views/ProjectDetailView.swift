@@ -14,7 +14,6 @@ struct ProjectDetailView: View {
                     ProjectActionButtons(project: project)
                 }
                 .controlSize(.large)
-                .disabled(store.isBusy(project))
             }
             .padding(28)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -27,7 +26,9 @@ struct ProjectDetailView: View {
             Text(project.name).font(.largeTitle.weight(.semibold))
             StatusBadge(status: project.status)
             if store.isBusy(project) {
-                ProgressView().controlSize(.small)
+                ProgressView()
+                    .controlSize(.small)
+                    .accessibilityLabel("Action en cours")
             }
         }
     }
@@ -44,6 +45,7 @@ struct ProjectDetailView: View {
                     .textSelection(.enabled)
                     .lineLimit(1)
                     .truncationMode(.middle)
+                    .help(project.appRoot)
             }
             GridRow {
                 Text("URL").foregroundStyle(.secondary)

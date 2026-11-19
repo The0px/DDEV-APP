@@ -9,35 +9,39 @@ struct ProjectActionButtons: View {
     let project: DDEVProject
 
     var body: some View {
-        if project.status == .running {
-            Button {
-                Task { await store.stop(project) }
-            } label: {
-                Label("Arrêter", systemImage: "stop.fill")
-            }
-        } else {
-            Button {
-                Task { await store.start(project) }
-            } label: {
-                Label("Démarrer", systemImage: "play.fill")
-            }
-            .buttonStyle(.borderedProminent)
-        }
+        Group {
+            if project.status == .running {
+                Button {
+                    Task { await store.stop(project) }
+                } label: {
+                    Label("Arrêter", systemImage: "stop.fill")
+                }
 
-        Button {
-            Task { await store.restart(project) }
-        } label: {
-            Label("Redémarrer", systemImage: "arrow.triangle.2.circlepath")
-        }
-
-        if let url = project.primaryURL {
-            Button {
-                openURL(url)
-            } label: {
-                Label("Ouvrir le site", systemImage: "safari")
+                Button {
+                    Task { await store.restart(project) }
+                } label: {
+                    Label("Redémarrer", systemImage: "arrow.triangle.2.circlepath")
+                }
+            } else {
+                Button {
+                    Task { await store.start(project) }
+                } label: {
+                    Label("Démarrer", systemImage: "play.fill")
+                }
+                .buttonStyle(.borderedProminent)
             }
-            .disabled(project.status != .running)
+
+            if let url = project.primaryURL {
+                Button {
+                    openURL(url)
+                } label: {
+                    Label("Ouvrir le site", systemImage: "safari")
+                }
+                .disabled(project.status != .running)
+                .help(project.status == .running ? url.absoluteString : "Démarrez le projet pour ouvrir le site")
+            }
         }
+        .disabled(store.isBusy(project))
 
         Button {
             NSWorkspace.shared.activateFileViewerSelecting([URL(fileURLWithPath: project.appRoot)])
